@@ -1,34 +1,88 @@
-cat1ClickCount = 0;
-cat1Name = "Dr. Fuzzles";
-cat2ClickCount = 0;
-cat2Name = "CatFace"
+cats = [
+	{
+		name: "Dr. Fuzzles",
+		clicks: 0,
+		photo: "Resources/DrFuzzles.jpeg"
+	},
+	{
+		name: "CatFace",
+		clicks: 0,
+		photo: "Resources/CatFace.jpeg"
+	},
+	{
+		name: "CrankyPants",
+		clicks: 0,
+		photo: "Resources/CrankyPants.jpeg"
+	},
+	{
+		name: "Snowball",
+		clicks: 0,
+		photo: "Resources/Snowball.jpg"
+	},
+	{
+		name: "Stripey",
+		clicks: 0,
+		photo: "Resources/Stripey.jpeg"
+	}
+];
 
-var UpdateCat = function(catDOMElement, name, clickCount) {
-	var nameElement = catDOMElement.getElementsByClassName("Name")[0];
-	nameElement.textContent = name;
-	var counterElement = catDOMElement.getElementsByClassName("Counter")[0];
-	counterElement.textContent = clickCount;
+selectedCatIndex = 0;
+
+var SetSelection = function(selectedIndex) {
+	selectedCatIndex = selectedIndex;
+	UpdatePage();
+};
+
+var UpdateSelector = function(catCollection, chosenIndex) {
+	var selectorElement = document.getElementById("SelectorArea");
+
+	selectorElement.innerHTML = "";
+
+	for(var catIter = 0; catIter < catCollection.length; ++catIter)
+	{
+		var selectionElement = document.createElement("div");
+		selectionElement.setAttribute("id", "Cat." + catIter);
+		selectionElement.textContent = catCollection[catIter].name;
+		selectionElement.addEventListener("click", (function(selectionIndex) {
+			return function() {
+				SetSelection(selectionIndex);
+			};
+		})(catIter));
+
+		selectorElement.appendChild(selectionElement);
+	}
+};
+
+var IncrementClicks = function(cat) {
+	cat.clicks++;
+	UpdatePage();
+};
+
+var UpdateCat = function(cat) {
+	var nameElement = document.getElementById("CatArea.Name");
+	var clicksElement = document.getElementById("CatArea.Clicks");
+	var photoElement = document.getElementById("CatArea.Photo");
+
+	photoElement.innerHTML = "";
+
+	nameElement.textContent = cat.name;
+	clicksElement.textContent = cat.clicks;
+	var imageElement = document.createElement("img");
+	imageElement.setAttribute("src", cat.photo);
+	imageElement.setAttribute("width", "50%");
+	imageElement.addEventListener("click", (function(thisCat) {
+		return function() {
+			IncrementClicks(thisCat);
+		};
+	})(cat));
+
+	photoElement.appendChild(imageElement);
 };
 
 var UpdatePage = function() {
-	var cat1Element = document.getElementById("Cat1");
-	UpdateCat(cat1Element, cat1Name, cat1ClickCount);
-
-	var cat2Element = document.getElementById("Cat2");
-	UpdateCat(cat2Element, cat2Name, cat2ClickCount);
+	UpdateSelector(cats, selectedCatIndex);
+	UpdateCat(cats[selectedCatIndex]);
 };
-
-var cat1PhotoElement = document.getElementById("Cat1").getElementsByClassName("Photo")[0];
-cat1PhotoElement.addEventListener("click", function() {
-	cat1ClickCount++;
-	UpdatePage();
-});
-
-var cat2PhotoElement = document.getElementById("Cat2").getElementsByClassName("Photo")[0];
-cat2PhotoElement.addEventListener("click", function() {
-	cat2ClickCount++;
-	UpdatePage();
-});
 
 document.addEventListener("DOMContentLoaded", function() {
 	UpdatePage();
